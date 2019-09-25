@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    app:startDestination="@+id/imagesScreen">
+
+    <fragment
+        android:id="@+id/imagesScreen"
+        android:name="com.example.testjavaapp.fragments.ImagesFragment"
+        android:label="@string/fragment_images"
+        tools:layout="@layout/fragment_images">
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationScreen"
+        android:name="com.example.testjavaapp.fragments.NotificationFragment"
+        android:label="@string/fragment_2"
+        tools:layout="@layout/fragment_notification">
+    </fragment>
+
+</navigation>

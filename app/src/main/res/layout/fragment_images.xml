@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Load Images"
+         />
+
+    <EditText
+        android:id="@+id/et_threadNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button"
+        android:layout_marginTop="6dp"
+        android:hint="Cyclic barrier num"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/et_semaphoreNum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_threadNumber"
+        android:layout_marginTop="10dp"
+        android:hint="Semaphore num"
+        android:inputType="number" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_images"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_semaphoreNum"
+        android:layout_marginTop="32dp">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+</RelativeLayout>
