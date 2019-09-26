@@ -55,8 +55,6 @@ public class DownloadImageRunnable implements Runnable {
             bitmaps.add(bitmap);
 
         countDownLatch.countDown();
-
     }
-
 }
 

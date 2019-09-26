@@ -72,7 +72,6 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
         addItems();
         initRecyclerView();
         btn_load.setOnClickListener(view1 -> click());
-
     }
 
     private void initRecyclerView() {

@@ -63,7 +63,6 @@ public class NotificationFragment extends Fragment {
                 sendNotification();
             }
         });
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

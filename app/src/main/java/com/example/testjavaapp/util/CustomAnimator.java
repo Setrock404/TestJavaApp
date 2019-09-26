@@ -31,7 +31,6 @@ public class CustomAnimator {
                 super.onAnimationStart(animation);
                 isAnimate = true;
                 view.setEnabled(false);
-                view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
 
             @Override
@@ -39,7 +38,6 @@ public class CustomAnimator {
                 super.onAnimationEnd(animation);
                 isAnimate = false;
                 view.setEnabled(true);
-                view.setLayerType(View.LAYER_TYPE_NONE, null);
             }
         };
     }
@@ -48,7 +46,6 @@ public class CustomAnimator {
         AnimatorSet set = new AnimatorSet();
         set.setDuration(SHRINK_DURATION).playTogether(
                 ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f),
-                ObjectAnimator.ofFloat(view, View.SCALE_X, 1f, 0f),
                 ObjectAnimator.ofFloat(view, View.SCALE_Y, 1f, 0f)
         );
         return set;
@@ -58,7 +55,6 @@ public class CustomAnimator {
         AnimatorSet set = new AnimatorSet();
         set.setDuration(EXPAND_DURATION).playTogether(
                 ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f),
-                ObjectAnimator.ofFloat(view, View.SCALE_X, 0f, 1f),
                 ObjectAnimator.ofFloat(view, View.SCALE_Y, 0f, 1f)
         );
         set.setStartDelay(DELAY_DURATION);

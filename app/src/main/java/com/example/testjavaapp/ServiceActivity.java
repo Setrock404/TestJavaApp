@@ -133,7 +133,6 @@ public class ServiceActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter(mBroadcastBitmapAction));
-
     }
 
     private void addItems() {

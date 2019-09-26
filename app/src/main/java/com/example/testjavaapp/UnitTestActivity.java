@@ -46,7 +46,6 @@ public class UnitTestActivity extends AppCompatActivity {
             String res = getString(R.string.result_size_text) + BitmapResizer.resizeBitmap(viewSize, bitmapSize);
             tv_result.setText(res);
         }
-
     }
 
     private boolean checkInput() {

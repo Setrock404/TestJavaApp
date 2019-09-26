@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name">TestJavaApp</string>
-    <string name="images">Images</string>
+    <string name="images">Images(Task 8)</string>
     <string name="notifications">Notification(Task 7)</string>
     <string name="fragment_images">images</string>
-    <string name="fragment_2">fragment2</string>
-    <string name="hello_blank_fragment">Greetings!</string>
+    <string name="notification">notification</string>
     <string name="channel_name">channel_name</string>
     <string name="channel_description">some desc</string>
     <string name="service">Service(Task 9)</string>
