@@ -16,16 +16,16 @@ public class JUnit4SizeTest {
 
     @Test
     public void resize_isCorrect1() {
-        int actual = BitmapResizer.resizeBitmap(150,200);
-        int expected =  150;
-        assertEquals("Resize failed",expected, actual);
+        int actual = BitmapResizer.resizeBitmap(150, 200);
+        int expected = 150;
+        assertEquals("Resize failed", expected, actual);
     }
 
     @Test
     public void resize_isCorrect2() {
-        int actual = BitmapResizer.resizeBitmap(150,100);
-        int expected =  100;
-        assertEquals("Resize failed",expected, actual);
+        int actual = BitmapResizer.resizeBitmap(150, 100);
+        int expected = 100;
+        assertEquals("Resize failed", expected, actual);
     }
 
 }

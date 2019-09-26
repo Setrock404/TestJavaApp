@@ -13,4 +13,11 @@
     <string name="wrong_input">Wrong input</string>
     <string name="result_size_text">Result size is:</string>
     <string name="add_notification">Add Notification</string>
+    <string name="send_notification">Send Notification</string>
+    <string name="cancel_notification">Cancel Notification</string>
+    <string name="enter_notification_body">Enter notification body</string>
+    <string name="enter_notification_title">Enter notification title</string>
+    <string name="enter_num_of_threads">Enter num of Threads</string>
+    <string name="simultaneous_thread_num">Enter num of Threads to work simultaneously</string>
+    <string name="load_images">Load Images</string>
 </resources>

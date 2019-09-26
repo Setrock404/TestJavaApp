@@ -17,9 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.testjavaapp.R;
 
 
-public class ImageRecyclerAdaptor extends RecyclerView.Adapter<ImageRecyclerAdaptor.ImageViewHolder> {
-
-    public static final String TAG = "RecyclerView";
+public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdapter.ImageViewHolder> {
 
     private int lastPosition = -1;
 
@@ -27,7 +25,7 @@ public class ImageRecyclerAdaptor extends RecyclerView.Adapter<ImageRecyclerAdap
 
     private Context context;
 
-    public ImageRecyclerAdaptor(Context context) {
+    public ImageRecyclerAdapter(Context context) {
         this.context = context;
         bitmaps = new ArrayList<>();
     }
@@ -35,7 +33,6 @@ public class ImageRecyclerAdaptor extends RecyclerView.Adapter<ImageRecyclerAdap
     @NonNull
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_image_list_item, parent, false);
         return new ImageViewHolder(view);
     }
@@ -54,45 +51,6 @@ public class ImageRecyclerAdaptor extends RecyclerView.Adapter<ImageRecyclerAdap
         }
     }
 
-//    public void updateRange(int numOfImagesAdded) {
-//
-////        for(DownloadImageAsync2 a: asyncQueue)
-////        {
-////            Log.d(TAG, "execute task...");
-////            //a.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-////            a.execute();
-////        }
-//
-////        DownloadImageAsync2 downloadImageAsync2 = new DownloadImageAsync2(barrier,semaphore, countDownLatch,images.get(0),bitmaps);
-////        downloadImageAsync2.execute();
-////        DownloadImageAsync2 downloadImageAsync3 = new DownloadImageAsync2(barrier,semaphore, countDownLatch,images.get(1),bitmaps);
-////        downloadImageAsync3.execute();
-////        DownloadImageAsync2 downloadImageAsync4 = new DownloadImageAsync2(barrier,semaphore, countDownLatch,images.get(2),bitmaps);
-////        downloadImageAsync4.execute();
-//
-////        Thread thread1 = new Thread(new DownloadImageThread(barrier,semaphore, countDownLatch,images.get(0),bitmaps));
-////        thread1.start();
-////        Thread thread2 = new Thread(new DownloadImageThread(barrier,semaphore, countDownLatch,images.get(1),bitmaps));
-////        thread2.start();
-////        Thread thread3 = new Thread(new DownloadImageThread(barrier,semaphore, countDownLatch,images.get(2),bitmaps));
-////        thread3.start();
-//        this.numOfImagesAdded = numOfImagesAdded;
-//
-//        for (Thread t : threadQueue)
-//            t.start();
-//    }
-
-//    public void setThreadConfigurations(int threads, int semaphoreNum) {
-//        barrier = new CyclicBarrier(threads);
-//        semaphore = new Semaphore(semaphoreNum, true);
-//        countDownLatch = new CountDownLatch(threads);
-//        addCompleteTask();
-//    }
-//
-//    private void addCompleteTask() {
-//        threadQueue.add(new Thread(new DownloadImageThreadComplete(this, countDownLatch)));
-//    }
-
     @Override
     public int getItemCount() {
         return bitmaps.size();
@@ -109,14 +67,12 @@ public class ImageRecyclerAdaptor extends RecyclerView.Adapter<ImageRecyclerAdap
     }
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
-
         ImageView imageView;
 
         ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.list_imageView);
         }
-
     }
 }
 

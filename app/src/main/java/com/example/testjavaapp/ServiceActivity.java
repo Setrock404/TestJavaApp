@@ -16,8 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.testjavaapp.adaptor.ImageRecyclerAdaptor;
-import com.example.testjavaapp.data.DataHolder;
+import com.example.testjavaapp.adaptor.ImageRecyclerAdapter;
+import com.example.testjavaapp.data.BitmapHolder;
 import com.example.testjavaapp.service.BroadcastService;
 
 import java.util.ArrayList;
@@ -25,9 +25,8 @@ import java.util.ArrayList;
 public class ServiceActivity extends AppCompatActivity {
 
     public static final String mBroadcastBitmapAction = "com.truiton.broadcast.string";
-    private static final String TAG = "RecyclerView";
     private RecyclerView recyclerView;
-    private ImageRecyclerAdaptor adapter;
+    private ImageRecyclerAdapter adapter;
     private Button btn_load;
     private EditText et_barrierNum;
     private EditText et_semaphoreNum;
@@ -42,12 +41,16 @@ public class ServiceActivity extends AppCompatActivity {
 
     private IntentFilter mIntentFilter;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_images);
+
+        String launchedFrom = getIntent().getStringExtra("launchedFrom");
+
+        if (launchedFrom != null) {
+            Toast.makeText(this, "Launched from " + launchedFrom, Toast.LENGTH_SHORT).show();
+        }
 
         recyclerView = findViewById(R.id.recycler_view_images);
         btn_load = findViewById(R.id.button);
@@ -58,10 +61,9 @@ public class ServiceActivity extends AppCompatActivity {
         semaphoreNum = 0;
         currentNumOfClicks = 0;
 
-        adapter = new ImageRecyclerAdaptor(this);
+        adapter = new ImageRecyclerAdapter(this);
 
         addItems();
-
         btn_load.setOnClickListener(view1 -> click());
         initRecyclerView();
 
@@ -75,7 +77,7 @@ public class ServiceActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void click(){
+    private void click() {
 
         //IF FIRST CLICK CHECK INPUT AND PROCEED
         if (numOfPictures == 0) {
@@ -104,8 +106,8 @@ public class ServiceActivity extends AppCompatActivity {
     private void loadWithService() {
         Intent serviceIntent = new Intent(this, BroadcastService.class);
         serviceIntent.putExtra("barrier_num", numOfPictures);
-        serviceIntent.putExtra("semaphore_num",semaphoreNum);
-        serviceIntent.putStringArrayListExtra("url_list",urlsToLoad);
+        serviceIntent.putExtra("semaphore_num", semaphoreNum);
+        serviceIntent.putStringArrayListExtra("url_list", urlsToLoad);
         startService(serviceIntent);
     }
 
@@ -144,10 +146,9 @@ public class ServiceActivity extends AppCompatActivity {
         urls.add("https://i.ytimg.com/vi/DItov3CYM_w/hqdefault.jpg");
         urls.add("https://cnet3.cbsistatic.com/img/rdEm2TvKo_XDj2mRwdgHa5Iolbo=/1092x0/2019/08/26/56497cd9-7fe4-438c-8b11-5240c29a317e/ebff9hkw4aegbfj.jpg");
         urls.add("https://cdn.vox-cdn.com/thumbor/pAOIY3gvUyx3j97J7gnQnGTWVoc=/0x0:1920x1080/1200x800/filters:focal(725x485:1031x791)/cdn.vox-cdn.com/uploads/chorus_image/image/53153749/legobatmancover.0.jpg");
-
     }
 
-    private void resetData(){
+    private void resetData() {
         currentNumOfClicks = 0;
         numOfPictures = 0;
         bitmaps.clear();
@@ -160,18 +161,16 @@ public class ServiceActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d(TAG, "onReceive: Message received");
-            bitmaps = DataHolder.getInstance().getBitmaps();
+            bitmaps = BitmapHolder.getInstance().getBitmaps();
             Toast.makeText(ServiceActivity.this, "Downloading complete", Toast.LENGTH_SHORT).show();
-            adapter.updateImages(bitmaps, numOfPictures);
+            if(bitmaps.size()>0)
+                adapter.updateImages(bitmaps, bitmaps.size());
 
             resetData();
 
             Intent stopIntent = new Intent(ServiceActivity.this,
                     BroadcastService.class);
             stopService(stopIntent);
-
-
         }
     };
 
@@ -180,5 +179,4 @@ public class ServiceActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         super.onPause();
     }
-
 }

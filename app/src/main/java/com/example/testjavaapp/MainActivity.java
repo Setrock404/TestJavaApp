@@ -12,14 +12,13 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = "RecyclerView";
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -29,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
@@ -38,19 +36,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String menuFragment = getIntent().getStringExtra("menuFragment");
 
         if (menuFragment != null) {
-            Log.d(TAG, "onCreate: Created with string" + menuFragment);
             Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.notificationScreen);
         }
-
     }
-    private void init(){
+
+    private void init() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout);
         NavigationUI.setupWithNavController(navigationView, navController);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    public boolean isValidDestination(int destination){
+    public boolean isValidDestination(int destination) {
         return destination != Navigation.findNavController(this, R.id.nav_host_fragment).getCurrentDestination().getId();
     }
 
@@ -61,19 +58,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
+        } else {
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        switch(menuItem.getItemId()){
+        switch (menuItem.getItemId()) {
 
-            case R.id.nav_images:{
+            case R.id.nav_images: {
 
                 // nav options to clear backstack
                 NavOptions navOptions = new NavOptions.Builder()
@@ -88,22 +84,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             }
 
-            case R.id.nav_notifications:{
-                if(isValidDestination(R.id.notificationScreen)){
+            case R.id.nav_notifications: {
+                if (isValidDestination(R.id.notificationScreen)) {
                     Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.notificationScreen);
                 }
                 break;
             }
 
             case R.id.nav_service: {
-                Log.d(TAG, "onNavigationItemSelected: service");
-                Intent intent = new Intent(this,ServiceActivity.class);
+                Intent intent = new Intent(this, ServiceActivity.class);
+                intent.putExtra("launchedFrom", TAG);
                 startActivity(intent);
                 break;
             }
             case R.id.nav_test: {
-                Log.d(TAG, "onNavigationItemSelected: test");
-                Intent intent = new Intent(this,UnitTestActivity.class);
+                Intent intent = new Intent(this, UnitTestActivity.class);
                 startActivity(intent);
                 break;
             }

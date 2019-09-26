@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.NotificationFragment">
 
-   <Button
+   <EditText
+       android:id="@+id/et_notification_title"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
+       android:hint="@string/enter_notification_title" />
+
+   <EditText
+       android:id="@+id/et_notification_body"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/et_notification_title"
+       android:layout_marginTop="12dp"
+       android:hint="@string/enter_notification_body" />
+
+   <Button
        android:id="@+id/btn_notification"
-       android:text="@string/add_notification"/>
-</FrameLayout>
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/et_notification_body"
+       android:layout_marginTop="43dp"
+       android:text="@string/add_notification" />
+</RelativeLayout>

@@ -6,67 +6,75 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.example.testjavaapp.ServiceActivity;
-import com.example.testjavaapp.data.DataHolder;
-import com.example.testjavaapp.util.DownloadCallback;
-import com.example.testjavaapp.util.DownloadImageThread;
-import com.example.testjavaapp.util.DownloadImageThreadComplete;
+import com.example.testjavaapp.data.BitmapHolder;
+import com.example.testjavaapp.util.DownloadImageRunnable;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
-public class BroadcastService extends Service implements DownloadCallback {
-    private String LOG_TAG = "RecyclerView";
+public class BroadcastService extends Service {
     private ArrayList<String> urls;
-    private ArrayList<Bitmap> bitmaps;
+    private ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
     private CyclicBarrier barrier;
     private Semaphore semaphore;
     private CountDownLatch countDownLatch;
 
+    private int threadNum;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        LOG_TAG = "RecyclerView";
-        Log.d(LOG_TAG, "In onCreate");
-        bitmaps = new ArrayList<>();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "In onStartCommand");
 
         setDownloadData(intent);
 
         return START_REDELIVER_INTENT;
     }
 
+    private Runnable downloadBitmaps = new Runnable() {
+        @Override
+        public void run() {
+            for (int i = 0; i < threadNum; i++) {
+                new Thread(new DownloadImageRunnable(barrier, semaphore, countDownLatch, urls.get(i), bitmaps)).start();
+            }
+            try {
+                countDownLatch.await();
+                onImagesDownloaded();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     private void setDownloadData(Intent intent) {
 
-        int barrierNum = intent.getIntExtra("barrier_num",0);
-        int semaphoreNum = intent.getIntExtra("semaphore_num",0);
+        threadNum = intent.getIntExtra("barrier_num", 0);
         urls = intent.getStringArrayListExtra("url_list");
+        int semaphoreNum = intent.getIntExtra("semaphore_num", 0);
 
-        barrier = new CyclicBarrier(barrierNum);
-        semaphore = new Semaphore(semaphoreNum,true);
-        countDownLatch = new CountDownLatch(barrierNum);
+        setThreadConfiguration(semaphoreNum);
 
-        new Thread(new DownloadImageThreadComplete(this,countDownLatch)).start();
-        for(int i=0; i<barrierNum;i++){
-            new Thread(new DownloadImageThread(barrier, semaphore, countDownLatch, urls.get(i), bitmaps)).start();
-        }
+        new Thread(downloadBitmaps).start();
+    }
 
+    private void setThreadConfiguration(int semaphoreNum) {
+        barrier = new CyclicBarrier(threadNum);
+        semaphore = new Semaphore(semaphoreNum, true);
+        countDownLatch = new CountDownLatch(threadNum);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // Wont be called as service is not bound
-        Log.d(LOG_TAG, "In onBind");
         return null;
     }
 
@@ -74,26 +82,21 @@ public class BroadcastService extends Service implements DownloadCallback {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Log.d(LOG_TAG, "In onTaskRemoved");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(LOG_TAG, "In onDestroy");
     }
 
-    @Override
-    public void onImagesDownloaded() {
-        Log.d("RecyclerView", "onImagesDownloaded: service");
-        DataHolder.getInstance().setBitmaps(bitmaps);
+    private void onImagesDownloaded() {
+
+        BitmapHolder.getInstance().setBitmaps(bitmaps);
 
         Intent broadcastIntent = new Intent();
         broadcastIntent
                 .setAction(ServiceActivity.mBroadcastBitmapAction);
 
-//            sendBroadcast(broadcastIntent);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
-
     }
 }

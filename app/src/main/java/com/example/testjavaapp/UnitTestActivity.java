@@ -18,8 +18,6 @@ import android.widget.TextView;
 
 public class UnitTestActivity extends AppCompatActivity {
 
-    public static final String TAG = "TestingContext";
-
     private EditText et_viewSize;
     private EditText et_bitmapSize;
     private TextView tv_result;
@@ -36,11 +34,9 @@ public class UnitTestActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
-
         et_viewSize = findViewById(R.id.et_view_size);
         et_bitmapSize = findViewById(R.id.et_bitmap_size);
         tv_result = findViewById(R.id.tv_res_size);
-
     }
 
     // FUNCTIONS THAT VALIDATES INPUT AND SELECTS MIN NUMBER
@@ -57,11 +53,8 @@ public class UnitTestActivity extends AppCompatActivity {
 
         viewSizeText = et_viewSize.getText().toString();
         bitmapSizeText = et_bitmapSize.getText().toString();
-        Log.d(TAG, "checkInput view size is:" + viewSizeText);
-        Log.d(TAG, "checkInput bitmap size is:" + bitmapSizeText);
 
         if (!inputIsCorrect(viewSizeText) || !inputIsCorrect(bitmapSizeText)) {
-            Log.d(TAG, "checkInput: Input is WRONG");
             tv_result.setText(R.string.wrong_input);
             return false;
         } else {
@@ -69,11 +62,9 @@ public class UnitTestActivity extends AppCompatActivity {
             bitmapSize = Integer.parseInt(bitmapSizeText);
             return true;
         }
-
     }
 
     private boolean inputIsCorrect(String text) {
         return (!text.trim().isEmpty() && Integer.parseInt(text) > 0);
     }
-
 }

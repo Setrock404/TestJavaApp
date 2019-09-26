@@ -5,24 +5,24 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
-public class DownloadImageThread implements Runnable {
+public class DownloadImageRunnable implements Runnable {
 
-
-    private static final String TAG = "RecyclerView";
+    private static final String TAG = DownloadImageRunnable.class.getSimpleName();
     private final CyclicBarrier cyclicBarrier;
     private final Semaphore semaphore;
     private final CountDownLatch countDownLatch;
 
-    private String url;
-    private ArrayList<Bitmap> bitmaps;
+    private final String url;
+    private final ArrayList<Bitmap> bitmaps;
 
-    public DownloadImageThread(CyclicBarrier cyclicBarrier, Semaphore semaphore, CountDownLatch countDownLatch, String url, ArrayList<Bitmap> bitmaps) {
+    public DownloadImageRunnable(CyclicBarrier cyclicBarrier, Semaphore semaphore, CountDownLatch countDownLatch, String url, ArrayList<Bitmap> bitmaps) {
         this.cyclicBarrier = cyclicBarrier;
         this.semaphore = semaphore;
         this.countDownLatch = countDownLatch;
@@ -35,16 +35,10 @@ public class DownloadImageThread implements Runnable {
 
         Bitmap bitmap = null;
         try {
-
             semaphore.acquire();
-            String imageURL = url;
-            try {
-                InputStream input = new java.net.URL(imageURL).openStream();
-                bitmap = BitmapFactory.decodeStream(input);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            InputStream input = new java.net.URL(url).openStream();
+            bitmap = BitmapFactory.decodeStream(input);
 
             Log.d(TAG, "Thread " + Thread.currentThread().getName() + " has finished its work.. waiting for others...");
 
@@ -53,10 +47,13 @@ public class DownloadImageThread implements Runnable {
             semaphore.release();
             cyclicBarrier.await();
 
-        } catch (InterruptedException | BrokenBarrierException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        bitmaps.add(bitmap);
+
+        if (bitmap != null)
+            bitmaps.add(bitmap);
+
         countDownLatch.countDown();
 
     }

@@ -22,34 +22,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.testjavaapp.MainActivity;
 import com.example.testjavaapp.R;
+import com.example.testjavaapp.util.CustomAnimator;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class NotificationFragment extends Fragment {
 
+    private Button addNotificationBtn;
+    private EditText et_NotificationTitle;
+    private EditText et_NotificationBody;
 
     private static final String CHANNEL_ID = "CUSTOM_ID";
-    private static final String TAG = "Notification";
+    private static final int NOTIFICATION_ID = 123;
     private NotificationManagerCompat notificationManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_notification, container, false);
     }
 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Button addNotificationBtn = view.findViewById(R.id.btn_notification);
+        et_NotificationTitle = view.findViewById(R.id.et_notification_title);
+        et_NotificationBody = view.findViewById(R.id.et_notification_body);
+
+        addNotificationBtn = view.findViewById(R.id.btn_notification);
         notificationManager = NotificationManagerCompat.from(getActivity());
 
         addNotificationBtn.setOnClickListener(new View.OnClickListener() {
@@ -63,42 +67,42 @@ public class NotificationFragment extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void sendNotification() {
+    private void sendNotification() {
 
-        if(isNotificationVisible()){
-            notificationManager.cancel(1);
-            Log.d(TAG, "sendNotification: "+notificationManager.getNotificationChannels());
+        if (isNotificationVisible()) {
+            CustomAnimator.pressAnimation(addNotificationBtn);
+            notificationManager.cancel(NOTIFICATION_ID);
+            addNotificationBtn.setText(R.string.send_notification);
             return;
         }
 
+        String notificationTitle = et_NotificationTitle.getText().toString();
+        String notificationBody = et_NotificationBody.getText().toString();
 
+        if (inputIsWrong(notificationTitle) || inputIsWrong(notificationBody)) {
+            Toast.makeText(getActivity(), "Input is wrong", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        CustomAnimator.pressAnimation(addNotificationBtn);
         createNotificationChannel();
 
-        Intent notificationIntent = new Intent(getActivity(),MainActivity.class);
+        Intent notificationIntent = new Intent(getActivity(), MainActivity.class);
         notificationIntent.putExtra("menuFragment", "favoritesMenuItem");
         notificationIntent.setAction("OPEN_NOTIFICATION_FRAGMENT");
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
 
-        //Navigation way to redirect to Current Fragment
-//        PendingIntent pendingIntent2 =  new NavDeepLinkBuilder(getActivity())
-//                .setComponentName(MainActivity.class)
-//                     .setGraph(R.navigation.main)
-//                .setDestination(R.id.notificationScreen)
-//                .createPendingIntent();
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle("My notification")
-                .setContentText("Hello World!")
+                .setContentTitle(notificationTitle)
+                .setContentText(notificationBody)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
-
-        notificationManager.notify(1, builder.build());
-
+        addNotificationBtn.setText(R.string.cancel_notification);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     private void createNotificationChannel() {
@@ -119,13 +123,14 @@ public class NotificationFragment extends Fragment {
         NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
         StatusBarNotification[] notifications = mNotificationManager.getActiveNotifications();
         for (StatusBarNotification notification : notifications) {
-            if (notification.getId() == 1) {
+            if (notification.getId() == NOTIFICATION_ID) {
                 return true;
             }
         }
         return false;
     }
 
-
-
+    private boolean inputIsWrong(String text) {
+        return (text.trim().isEmpty());
+    }
 }

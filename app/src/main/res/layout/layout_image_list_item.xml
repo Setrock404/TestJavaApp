@@ -6,7 +6,6 @@
     android:maxHeight="150dp"
     android:maxWidth="150dp">
 
-
     <ImageView
         android:id="@+id/list_imageView"
         android:layout_width="match_parent"

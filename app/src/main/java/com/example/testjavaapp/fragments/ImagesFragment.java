@@ -18,10 +18,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.testjavaapp.R;
-import com.example.testjavaapp.adaptor.ImageRecyclerAdaptor;
+import com.example.testjavaapp.adaptor.ImageRecyclerAdapter;
 import com.example.testjavaapp.util.DownloadCallback;
-import com.example.testjavaapp.util.DownloadImageThread;
-import com.example.testjavaapp.util.DownloadImageThreadComplete;
+import com.example.testjavaapp.util.DownloadImageRunnable;
+import com.example.testjavaapp.util.DownloadCompleteRunnable;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -33,7 +33,7 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
 
 
     private RecyclerView recyclerView;
-    private ImageRecyclerAdaptor adapter;
+    private ImageRecyclerAdapter adapter;
     private Button btn_load;
     private EditText et_barrierNum;
     private EditText et_semaphoreNum;
@@ -49,8 +49,6 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
     private ArrayList<String> recyclerImages = new ArrayList<>();
     private ArrayList<Thread> threadQueue = new ArrayList<>();
     private ArrayList<Bitmap> bitmaps = new ArrayList<>();
-
-    private static final String TAG = "RecyclerView";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,7 +68,7 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
         semaphoreNum = 0;
         currentNumOfClicks = 0;
 
-        adapter = new ImageRecyclerAdaptor(getActivity());
+        adapter = new ImageRecyclerAdapter(getActivity());
         addItems();
         initRecyclerView();
         btn_load.setOnClickListener(view1 -> click());
@@ -82,7 +80,7 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
         recyclerView.setAdapter(adapter);
     }
 
-    private void click(){
+    private void click() {
 
         //IF FIRST CLICK CHECK INPUT AND PROCEED
         if (numOfPictures == 0) {
@@ -92,7 +90,7 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
             } else {
                 numOfPictures = Integer.parseInt(et_barrierNum.getText().toString());
                 semaphoreNum = Integer.parseInt(et_semaphoreNum.getText().toString());
-                setThreadConfigurations(numOfPictures,semaphoreNum);
+                setThreadConfigurations(numOfPictures, semaphoreNum);
                 setUiEnabled(false);
             }
         }
@@ -107,11 +105,10 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
             updateRange();
             setButtonEnabled(false);
         }
-        Log.d(TAG, "onClick: barrierthreads" + numOfPictures + "currentClicks: " + currentNumOfClicks);
     }
 
     private void addImageToDownload(String imageUrl) {
-        threadQueue.add(new Thread(new DownloadImageThread(barrier, semaphore, countDownLatch, imageUrl, bitmaps)));
+        threadQueue.add(new Thread(new DownloadImageRunnable(barrier, semaphore, countDownLatch, imageUrl, bitmaps)));
     }
 
     private void setThreadConfigurations(int threads, int semaphoreNum) {
@@ -122,30 +119,10 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
     }
 
     private void addCompleteTask() {
-        threadQueue.add(new Thread(new DownloadImageThreadComplete(this, countDownLatch)));
+        threadQueue.add(new Thread(new DownloadCompleteRunnable(this, countDownLatch)));
     }
 
     private void updateRange() {
-//        for(DownloadImageAsync2 a: asyncQueue)
-//        {
-//            Log.d(TAG, "execute task...");
-//            //a.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//            a.execute();
-//        }
-
-//        DownloadImageAsync2 downloadImageAsync2 = new DownloadImageAsync2(barrier,semaphore, countDownLatch,images.get(0),bitmaps);
-//        downloadImageAsync2.execute();
-//        DownloadImageAsync2 downloadImageAsync3 = new DownloadImageAsync2(barrier,semaphore, countDownLatch,images.get(1),bitmaps);
-//        downloadImageAsync3.execute();
-//        DownloadImageAsync2 downloadImageAsync4 = new DownloadImageAsync2(barrier,semaphore, countDownLatch,images.get(2),bitmaps);
-//        downloadImageAsync4.execute();
-
-//        Thread thread1 = new Thread(new DownloadImageThread(barrier,semaphore, countDownLatch,images.get(0),bitmaps));
-//        thread1.start();
-//        Thread thread2 = new Thread(new DownloadImageThread(barrier,semaphore, countDownLatch,images.get(1),bitmaps));
-//        thread2.start();
-//        Thread thread3 = new Thread(new DownloadImageThread(barrier,semaphore, countDownLatch,images.get(2),bitmaps));
-//        thread3.start();
         for (Thread t : threadQueue)
             t.start();
     }
@@ -164,7 +141,7 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
     }
 
 
-    private void resetData(){
+    private void resetData() {
         currentNumOfClicks = 0;
         numOfPictures = 0;
         threadQueue.clear();
@@ -185,14 +162,15 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
         recyclerImages.add("https://i.ytimg.com/vi/DItov3CYM_w/hqdefault.jpg");
         recyclerImages.add("https://cnet3.cbsistatic.com/img/rdEm2TvKo_XDj2mRwdgHa5Iolbo=/1092x0/2019/08/26/56497cd9-7fe4-438c-8b11-5240c29a317e/ebff9hkw4aegbfj.jpg");
         recyclerImages.add("https://cdn.vox-cdn.com/thumbor/pAOIY3gvUyx3j97J7gnQnGTWVoc=/0x0:1920x1080/1200x800/filters:focal(725x485:1031x791)/cdn.vox-cdn.com/uploads/chorus_image/image/53153749/legobatmancover.0.jpg");
-
     }
 
     @Override
     public void onImagesDownloaded() {
         Toast.makeText(getActivity(), "Downloading complete", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "" + bitmaps.size() + "  num of pictures: " + numOfPictures);
-        adapter.updateImages(bitmaps, numOfPictures);
+
+        if (bitmaps.size() > 0)
+            adapter.updateImages(bitmaps, bitmaps.size());
+
         resetData();
     }
 }
