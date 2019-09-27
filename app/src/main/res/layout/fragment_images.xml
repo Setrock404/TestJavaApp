@@ -7,8 +7,9 @@
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/load_images"
-         />
+        android:layout_margin="15dp"
+        android:background="@drawable/round_corners"
+        android:text="@string/load_images" />
 
     <EditText
         android:id="@+id/et_threadNumber"

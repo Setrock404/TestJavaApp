@@ -19,4 +19,8 @@
     <string name="enter_num_of_threads">Enter num of Threads</string>
     <string name="simultaneous_thread_num">Enter num of Threads to work simultaneously</string>
     <string name="load_images">Load Images</string>
+    <string name="calculate">Calculate</string>
+    <string name="result">Result</string>
+    <string name="enter_bitmap_size">Enter Bitmap size</string>
+    <string name="enter_view_size">Enter View Size</string>
 </resources>
