@@ -6,14 +6,14 @@ import java.util.ArrayList;
 
 public class BitmapHolder {
 
-    private ArrayList<Bitmap> data;
+    private ArrayList<Bitmap> bitmaps;
 
     public ArrayList<Bitmap> getBitmaps() {
-        return data;
+        return bitmaps;
     }
 
     public void setBitmaps(ArrayList<Bitmap> data) {
-        this.data = data;
+        this.bitmaps = data;
     }
 
     private static final BitmapHolder holder = new BitmapHolder();

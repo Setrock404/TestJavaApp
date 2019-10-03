@@ -14,10 +14,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavDeepLinkBuilder;
 
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +36,8 @@ public class NotificationFragment extends Fragment {
     private EditText et_NotificationBody;
 
     private static final String CHANNEL_ID = "CUSTOM_ID";
+    private String notificationTitle;
+    private String notificationBody;
     private static final int NOTIFICATION_ID = 123;
     private NotificationManagerCompat notificationManager;
 
@@ -52,45 +52,47 @@ public class NotificationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         et_NotificationTitle = view.findViewById(R.id.et_notification_title);
         et_NotificationBody = view.findViewById(R.id.et_notification_body);
-
         addNotificationBtn = view.findViewById(R.id.btn_notification);
         notificationManager = NotificationManagerCompat.from(getActivity());
-
         addNotificationBtn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                sendNotification();
+                processNotification();
             }
         });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void sendNotification() {
-
+    private void processNotification() {
+        //CANCEL NOTIFICATION,IF IT IS VISIBLE, ELSE SEND NEW NOTIFICATION IF INPUT IS CORRECT
         if (isNotificationVisible()) {
-            CustomAnimator.pressAnimation(addNotificationBtn);
-            notificationManager.cancel(NOTIFICATION_ID);
-            addNotificationBtn.setText(R.string.send_notification);
-            return;
+            cancelNotification();
+        } else if (inputIsValid()) {
+            sendNotification();
         }
+    }
 
-        String notificationTitle = et_NotificationTitle.getText().toString();
-        String notificationBody = et_NotificationBody.getText().toString();
+    private boolean inputIsValid() {
+        notificationTitle = et_NotificationTitle.getText().toString();
+        notificationBody = et_NotificationBody.getText().toString();
+        if (inputIsEmpty(notificationTitle) || inputIsEmpty(notificationBody)) {
+            Toast.makeText(getActivity(), "Fields can't be empty", Toast.LENGTH_SHORT).show();
+            return false;
+        } else return true;
+    }
 
-        if (inputIsWrong(notificationTitle) || inputIsWrong(notificationBody)) {
-            Toast.makeText(getActivity(), "Input is wrong", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void cancelNotification() {
+        CustomAnimator.pressAnimation(addNotificationBtn);
+        notificationManager.cancel(NOTIFICATION_ID);
+        addNotificationBtn.setText(R.string.send_notification);
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void sendNotification() {
         CustomAnimator.pressAnimation(addNotificationBtn);
         createNotificationChannel();
-
-        Intent notificationIntent = new Intent(getActivity(), MainActivity.class);
-        notificationIntent.putExtra("menuFragment", "favoritesMenuItem");
-        notificationIntent.setAction("OPEN_NOTIFICATION_FRAGMENT");
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, getNotificationIntent(), 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_background)
@@ -99,13 +101,19 @@ public class NotificationFragment extends Fragment {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
-
         addNotificationBtn.setText(R.string.cancel_notification);
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    private void createNotificationChannel() {
+    private Intent getNotificationIntent() {
+        Intent notificationIntent = new Intent(getActivity(), MainActivity.class);
+        notificationIntent.putExtra("menuFragment", "favoritesMenuItem");
+        notificationIntent.setAction("OPEN_NOTIFICATION_FRAGMENT");
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return notificationIntent;
+    }
 
+    private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
@@ -129,7 +137,7 @@ public class NotificationFragment extends Fragment {
         return false;
     }
 
-    private boolean inputIsWrong(String text) {
+    private boolean inputIsEmpty(String text) {
         return (text.trim().isEmpty());
     }
 }

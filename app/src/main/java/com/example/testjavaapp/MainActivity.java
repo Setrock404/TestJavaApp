@@ -30,17 +30,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
-
-        init();
-
+        initNavigation();
         String menuFragment = getIntent().getStringExtra("menuFragment");
-
         if (menuFragment != null) {
             Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.notificationScreen);
         }
     }
 
-    private void init() {
+    private void initNavigation() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -68,9 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-
             case R.id.nav_images: {
-
                 // nav options to clear backstack
                 NavOptions navOptions = new NavOptions.Builder()
                         .setPopUpTo(R.id.main, true)
@@ -83,14 +78,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         );
                 break;
             }
-
             case R.id.nav_notifications: {
                 if (isValidDestination(R.id.notificationScreen)) {
                     Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.notificationScreen);
                 }
                 break;
             }
-
             case R.id.nav_service: {
                 Intent intent = new Intent(this, ServiceActivity.class);
                 intent.putExtra("launchedFrom", TAG);
@@ -103,10 +96,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             }
         }
-
         menuItem.setChecked(true);
         drawerLayout.closeDrawer(GravityCompat.START);
-
         return true;
     }
 }

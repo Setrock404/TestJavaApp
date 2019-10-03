@@ -19,7 +19,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
 public class BroadcastService extends Service {
-    private ArrayList<String> urls;
+    private ArrayList<String> imagesUrls;
     private ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
     private CyclicBarrier barrier;
@@ -35,9 +35,7 @@ public class BroadcastService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         setDownloadData(intent);
-
         return START_REDELIVER_INTENT;
     }
 
@@ -45,7 +43,7 @@ public class BroadcastService extends Service {
         @Override
         public void run() {
             for (int i = 0; i < threadNum; i++) {
-                new Thread(new DownloadImageRunnable(barrier, semaphore, countDownLatch, urls.get(i), bitmaps)).start();
+                new Thread(new DownloadImageRunnable(barrier, semaphore, countDownLatch, imagesUrls.get(i), bitmaps)).start();
             }
             try {
                 countDownLatch.await();
@@ -57,13 +55,10 @@ public class BroadcastService extends Service {
     };
 
     private void setDownloadData(Intent intent) {
-
         threadNum = intent.getIntExtra("barrier_num", 0);
-        urls = intent.getStringArrayListExtra("url_list");
+        imagesUrls = intent.getStringArrayListExtra("url_list");
         int semaphoreNum = intent.getIntExtra("semaphore_num", 0);
-
         setThreadConfiguration(semaphoreNum);
-
         new Thread(downloadBitmaps).start();
     }
 
@@ -90,13 +85,10 @@ public class BroadcastService extends Service {
     }
 
     private void onImagesDownloaded() {
-
         BitmapHolder.getInstance().setBitmaps(bitmaps);
-
         Intent broadcastIntent = new Intent();
         broadcastIntent
                 .setAction(ServiceActivity.mBroadcastBitmapAction);
-
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
     }
 }

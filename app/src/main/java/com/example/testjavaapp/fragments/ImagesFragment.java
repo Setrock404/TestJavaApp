@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.testjavaapp.R;
-import com.example.testjavaapp.adaptor.ImageRecyclerAdapter;
+import com.example.testjavaapp.adapter.ImageRecyclerAdapter;
 import com.example.testjavaapp.util.DownloadCallback;
 import com.example.testjavaapp.util.DownloadImageRunnable;
 import com.example.testjavaapp.util.DownloadCompleteRunnable;
@@ -34,9 +33,9 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
 
     private RecyclerView recyclerView;
     private ImageRecyclerAdapter adapter;
-    private Button btn_load;
-    private EditText et_barrierNum;
-    private EditText et_semaphoreNum;
+    private Button loadBtn;
+    private EditText et_PicturesNumber;
+    private EditText et_semaphoreNumber;
 
     private CyclicBarrier barrier;
     private Semaphore semaphore;
@@ -58,20 +57,25 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         recyclerView = view.findViewById(R.id.recycler_view_images);
-        btn_load = view.findViewById(R.id.button);
-        et_barrierNum = view.findViewById(R.id.et_threadNumber);
-        et_semaphoreNum = view.findViewById(R.id.et_semaphoreNum);
+        adapter = new ImageRecyclerAdapter(getActivity());
+        initUI(view);
+        initData();
+        addItems();
+        initRecyclerView();
+    }
 
+    private void initUI(View view){
+        et_PicturesNumber = view.findViewById(R.id.et_threadNumber);
+        et_semaphoreNumber = view.findViewById(R.id.et_semaphoreNum);
+        loadBtn = view.findViewById(R.id.button);
+        loadBtn.setOnClickListener(view1 -> click());
+    }
+
+    private void initData() {
         numOfPictures = 0;
         semaphoreNum = 0;
         currentNumOfClicks = 0;
-
-        adapter = new ImageRecyclerAdapter(getActivity());
-        addItems();
-        initRecyclerView();
-        btn_load.setOnClickListener(view1 -> click());
     }
 
     private void initRecyclerView() {
@@ -80,15 +84,14 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
     }
 
     private void click() {
-
         //IF FIRST CLICK CHECK INPUT AND PROCEED
         if (numOfPictures == 0) {
-            if (inputIsWrong(et_barrierNum.getText().toString()) || inputIsWrong(et_semaphoreNum.getText().toString())) {
+            if (inputIsWrong(et_PicturesNumber.getText().toString()) || inputIsWrong(et_semaphoreNumber.getText().toString())) {
                 Toast.makeText(getActivity(), "Wrong input", Toast.LENGTH_SHORT).show();
                 return;
             } else {
-                numOfPictures = Integer.parseInt(et_barrierNum.getText().toString());
-                semaphoreNum = Integer.parseInt(et_semaphoreNum.getText().toString());
+                numOfPictures = Integer.parseInt(et_PicturesNumber.getText().toString());
+                semaphoreNum = Integer.parseInt(et_semaphoreNumber.getText().toString());
                 setThreadConfigurations(numOfPictures, semaphoreNum);
                 setUiEnabled(false);
             }
@@ -127,12 +130,12 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
     }
 
     private void setUiEnabled(boolean b) {
-        et_barrierNum.setEnabled(b);
-        et_semaphoreNum.setEnabled(b);
+        et_PicturesNumber.setEnabled(b);
+        et_semaphoreNumber.setEnabled(b);
     }
 
     private void setButtonEnabled(boolean b) {
-        btn_load.setEnabled(b);
+        loadBtn.setEnabled(b);
     }
 
     private boolean inputIsWrong(String text) {
@@ -166,10 +169,8 @@ public class ImagesFragment extends Fragment implements DownloadCallback {
     @Override
     public void onImagesDownloaded() {
         Toast.makeText(getActivity(), "Downloading complete", Toast.LENGTH_SHORT).show();
-
         if (bitmaps.size() > 0)
             adapter.updateImages(bitmaps, bitmaps.size());
-
         resetData();
     }
 }

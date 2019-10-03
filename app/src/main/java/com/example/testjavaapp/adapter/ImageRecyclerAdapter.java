@@ -1,4 +1,4 @@
-package com.example.testjavaapp.adaptor;
+package com.example.testjavaapp.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,7 +20,6 @@ import com.example.testjavaapp.R;
 public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdapter.ImageViewHolder> {
 
     private int lastPosition = -1;
-
     private ArrayList<Bitmap> bitmaps;
 
     private Context context;

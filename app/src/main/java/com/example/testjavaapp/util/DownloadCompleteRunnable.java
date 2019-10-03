@@ -18,7 +18,6 @@ public class DownloadCompleteRunnable implements Runnable {
 
     @Override
     public void run() {
-
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {

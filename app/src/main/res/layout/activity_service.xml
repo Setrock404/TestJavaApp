@@ -7,7 +7,7 @@
     tools:context=".ServiceActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_images_service"
+        android:id="@+id/service_recycler_view_images"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="32dp"

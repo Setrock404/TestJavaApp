@@ -11,12 +11,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.testjavaapp.adaptor.ImageRecyclerAdapter;
+import com.example.testjavaapp.adapter.ImageRecyclerAdapter;
 import com.example.testjavaapp.data.BitmapHolder;
 import com.example.testjavaapp.service.BroadcastService;
 
@@ -24,12 +23,12 @@ import java.util.ArrayList;
 
 public class ServiceActivity extends AppCompatActivity {
 
-    public static final String mBroadcastBitmapAction = "com.truiton.broadcast.string";
+    public static final String mBroadcastBitmapAction = "com.example.testjavaapp.bitmapAction";
     private RecyclerView recyclerView;
     private ImageRecyclerAdapter adapter;
-    private Button btn_load;
-    private EditText et_barrierNum;
-    private EditText et_semaphoreNum;
+    private Button loadBtn;
+    private EditText et_PicturesNumber;
+    private EditText et_semaphoreNumber;
 
     private int numOfPictures;
     private int semaphoreNum;
@@ -39,54 +38,49 @@ public class ServiceActivity extends AppCompatActivity {
     private ArrayList<String> urlsToLoad = new ArrayList<>();
     private ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
-    private IntentFilter mIntentFilter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_images);
-
+        recyclerView = findViewById(R.id.recycler_view_images);
         String launchedFrom = getIntent().getStringExtra("launchedFrom");
-
         if (launchedFrom != null) {
             Toast.makeText(this, "Launched from " + launchedFrom, Toast.LENGTH_SHORT).show();
         }
-
-        recyclerView = findViewById(R.id.recycler_view_images);
-        btn_load = findViewById(R.id.button);
-        et_barrierNum = findViewById(R.id.et_threadNumber);
-        et_semaphoreNum = findViewById(R.id.et_semaphoreNum);
-
-        numOfPictures = 0;
-        semaphoreNum = 0;
-        currentNumOfClicks = 0;
-
-        adapter = new ImageRecyclerAdapter(this);
-
-        addItems();
-        btn_load.setOnClickListener(view1 -> click());
         initRecyclerView();
-
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(mBroadcastBitmapAction);
-
+        initUI();
+        initData();
+        addItems();
     }
 
     private void initRecyclerView() {
+        adapter = new ImageRecyclerAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
 
-    private void click() {
+    private void initUI() {
+        et_PicturesNumber = findViewById(R.id.et_threadNumber);
+        et_semaphoreNumber = findViewById(R.id.et_semaphoreNum);
+        loadBtn = findViewById(R.id.button);
+        loadBtn.setOnClickListener(view1 -> click());
+    }
 
+    private void initData() {
+        numOfPictures = 0;
+        semaphoreNum = 0;
+        currentNumOfClicks = 0;
+    }
+
+    private void click() {
         //IF FIRST CLICK CHECK INPUT AND PROCEED
         if (numOfPictures == 0) {
-            if (inputIsWrong(et_barrierNum.getText().toString()) || inputIsWrong(et_semaphoreNum.getText().toString())) {
+            if (inputIsWrong(et_PicturesNumber.getText().toString()) || inputIsWrong(et_semaphoreNumber.getText().toString())) {
                 Toast.makeText(this, "Wrong input", Toast.LENGTH_SHORT).show();
                 return;
             } else {
-                numOfPictures = Integer.parseInt(et_barrierNum.getText().toString());
-                semaphoreNum = Integer.parseInt(et_semaphoreNum.getText().toString());
+                numOfPictures = Integer.parseInt(et_PicturesNumber.getText().toString());
+                semaphoreNum = Integer.parseInt(et_semaphoreNumber.getText().toString());
                 setUiEnabled(false);
             }
         }
@@ -112,7 +106,7 @@ public class ServiceActivity extends AppCompatActivity {
     }
 
     private boolean inputIsWrong(String text) {
-        return (text.trim().isEmpty() && Integer.parseInt(text) <= 0);
+        return (text.trim().isEmpty() || Integer.parseInt(text) <= 0);
     }
 
     private void addImageToDownload(String imageUrl) {
@@ -120,12 +114,12 @@ public class ServiceActivity extends AppCompatActivity {
     }
 
     private void setUiEnabled(boolean b) {
-        et_barrierNum.setEnabled(b);
-        et_semaphoreNum.setEnabled(b);
+        et_PicturesNumber.setEnabled(b);
+        et_semaphoreNumber.setEnabled(b);
     }
 
     private void setButtonEnabled(boolean b) {
-        btn_load.setEnabled(b);
+        loadBtn.setEnabled(b);
     }
 
     @Override
@@ -159,14 +153,11 @@ public class ServiceActivity extends AppCompatActivity {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             bitmaps = BitmapHolder.getInstance().getBitmaps();
             Toast.makeText(ServiceActivity.this, "Downloading complete", Toast.LENGTH_SHORT).show();
             if(bitmaps.size()>0)
                 adapter.updateImages(bitmaps, bitmaps.size());
-
             resetData();
-
             Intent stopIntent = new Intent(ServiceActivity.this,
                     BroadcastService.class);
             stopService(stopIntent);
